@@ -15,5 +15,4 @@ board_runner_args(openocd "--no-halt")
 include(${ZEPHYR_BASE}/boards/common/stm32cubeprogrammer.board.cmake)
 include(${ZEPHYR_BASE}/boards/common/pyocd.board.cmake)
 include(${ZEPHYR_BASE}/boards/common/jlink.board.cmake)
-#include(${ZEPHYR_BASE}/boards/common/openocd.board.cmake)
-# FIXME: official openocd runner not yet available.
+include(${ZEPHYR_BASE}/boards/common/openocd.board.cmake)
