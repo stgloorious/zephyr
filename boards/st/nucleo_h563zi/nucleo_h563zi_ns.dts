@@ -1,0 +1,108 @@
+/*
+ * Copyright (c) 2021 Linaro Limited
+ * Copyright (c) 2023 Thomas Stranger
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+/dts-v1/;
+#include "nucleo_h563zi-common.dtsi"
+
+
+/ {
+	model = "STMicroelectronics STM32H563ZI-NUCLEO board";
+	compatible = "st,stm32h563zi-nucleo";
+
+	#address-cells = <1>;
+	#size-cells = <1>;
+
+	chosen {
+		zephyr,console = &usart3;
+		zephyr,shell-uart = &usart3;
+		zephyr,sram = &sram1;
+		zephyr,flash = &flash0;
+		zephyr,code-partition = &slot0_partition;
+		zephyr,canbus = &fdcan1;
+	};
+
+	aliases {
+		led0 = &green_led_1;
+		sw0 = &user_button;
+		watchdog0 = &iwdg;
+		pwm-led0 = &pwm_led_1;
+		volt-sensor0 = &vref;
+		volt-sensor1 = &vbat;
+	};
+};
+
+&rng {
+	status = "okay";
+};
+
+/delete-node/ &boot_partition;
+/delete-node/ &slot0_partition;
+/delete-node/ &slot1_partition;
+/delete-node/ &storage_partition;
+
+&flash0 {
+	partitions {
+		compatible = "fixed-partitions";
+		#address-cells = <1>;
+		#size-cells = <1>;
+
+		boot_partition: partition@0 {
+			label = "mcuboot";
+			reg = <0x00000000 DT_SIZE_K(64)>;
+			read-only;
+		};
+		/* Secure image primary slot */
+		slot0_partition: partition@10000 {
+			label = "image-0";
+			reg = <0x00010000 DT_SIZE_K(256)>;
+		};
+		/* Non-secure image primary slot */
+		slot0_ns_partition: partition@50000 {
+			label = "image-0-nonsecure";
+			reg = <0x00050000 DT_SIZE_K(768)>;
+		};
+		/* Secure image secondary slot */
+		slot1_partition: partition@c0000 {
+			label = "image-1";
+			reg = <0x000c0000 DT_SIZE_K(256)>;
+		};
+		/* Non-secure image secondary slot */
+		slot1_ns_partition: partition@100000 {
+			label = "image-1-nonsecure";
+			reg = <0x00100000 DT_SIZE_K(768)>;
+		};
+		/* Applicative Non Volatile Storage */
+		storage_partition: partition@170000 {
+			label = "storage";
+			reg = <0x000170000 DT_SIZE_K(16)>;
+		};
+	};
+};
+
+&mac {
+	status = "okay";
+	pinctrl-0 = <&eth_rxd0_pc4
+		     &eth_rxd1_pc5
+		     &eth_ref_clk_pa1
+		     &eth_crs_dv_pa7
+		     &eth_tx_en_pg11
+		     &eth_txd0_pg13
+		     &eth_txd1_pb15>;
+	pinctrl-names = "default";
+};
+
+&mdio {
+	status = "okay";
+	pinctrl-0 = <&eth_mdio_pa2 &eth_mdc_pc1>;
+	pinctrl-names = "default";
+
+	ethernet-phy@0 {
+		compatible = "ethernet-phy";
+		reg = <0x00>;
+		status = "okay";
+	};
+};
