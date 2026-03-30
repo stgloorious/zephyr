@@ -49,6 +49,7 @@ config PWM_WITH_DMA
 # zephyr-keep-sorted-start
 source "drivers/pwm/Kconfig.ambiq_timer"
 source "drivers/pwm/Kconfig.b91"
+source "drivers/pwm/Kconfig.bitbang"
 source "drivers/pwm/Kconfig.bflb"
 source "drivers/pwm/Kconfig.cc13xx_cc26xx_timer"
 source "drivers/pwm/Kconfig.cc23x0_timer"
@@ -107,7 +108,5 @@ source "drivers/pwm/Kconfig.xmc4xxx_ccu8"
 # zephyr-keep-sorted-stop
 
 source "drivers/pwm/Kconfig.max2221x"
-
-source "drivers/pwm/Kconfig.bitbang"
 
 endif # PWM

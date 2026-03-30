@@ -2,12 +2,13 @@
 # SPDX-License-Identifier: Apache-2.0
 
 config PWM_BITBANG
-        bool "Bitbang PWM driver"
-        default y
-        depends on DT_HAS_ZEPHYR_BITBANG_PWM_ENABLED
-        depends on GPIO
-        help
-          Generic software-based PWM driver using hardware timer interrupts.
-          Use this as a fallback only if you don't have dedicated hardware PWM
-          pins left and understand the CPU overhead implications.
-          The period is the same for all channels.
+	bool "Bitbang PWM driver"
+	default y
+	depends on DT_HAS_ZEPHYR_BITBANG_PWM_ENABLED
+	depends on COUNTER
+	depends on GPIO
+	help
+	  Generic software-based PWM driver using hardware timer interrupts.
+	  Use this as a fallback only if you don't have dedicated hardware PWM
+	  pins left and understand the CPU overhead implications.
+	  The period is the same for all channels.
