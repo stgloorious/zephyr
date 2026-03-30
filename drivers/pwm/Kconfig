@@ -108,4 +108,6 @@ source "drivers/pwm/Kconfig.xmc4xxx_ccu8"
 
 source "drivers/pwm/Kconfig.max2221x"
 
+source "drivers/pwm/Kconfig.bitbang"
+
 endif # PWM
