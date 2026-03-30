@@ -48,9 +48,14 @@ static void led_gpio_blink_work_handler(struct k_work *work)
 	const struct led_gpio_config *config = blink->dev->config;
 	const struct gpio_dt_spec *led_gpio = &config->led[blink->led_idx];
 	uint32_t next_delay;
+	int err;
 
 	blink->is_on = !blink->is_on;
-	gpio_pin_set_dt(led_gpio, blink->is_on);
+	err = gpio_pin_set_dt(led_gpio, blink->is_on);
+	if (err) {
+		LOG_ERR("Failed to set LED (err %d)", err);
+		return;
+	}
 
 	next_delay = blink->is_on ? blink->delay_on : blink->delay_off;
 	k_work_schedule(&blink->work, K_MSEC(next_delay));
@@ -62,6 +67,7 @@ static int led_gpio_blink(const struct device *dev, uint32_t led,
 	const struct led_gpio_config *config = dev->config;
 	struct led_gpio_data *data = dev->data;
 	struct led_gpio_blink_data *blink;
+	int err;
 
 	if (led >= config->num_leds) {
 		return -EINVAL;
@@ -77,14 +83,15 @@ static int led_gpio_blink(const struct device *dev, uint32_t led,
 		return gpio_pin_set_dt(&config->led[led], 0);
 	}
 
-	blink->dev = dev;
-	blink->led_idx = led;
 	blink->delay_on = delay_on;
 	blink->delay_off = delay_off;
 	blink->is_on = true;
 
 	/* Start with LED on */
-	gpio_pin_set_dt(&config->led[led], 1);
+	err = gpio_pin_set_dt(&config->led[led], 1);
+	if (err) {
+		return err;
+	}
 	k_work_schedule(&blink->work, K_MSEC(delay_on));
 
 	return 0;
