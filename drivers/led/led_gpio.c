@@ -16,6 +16,10 @@
 #include <zephyr/device.h>
 #include <zephyr/kernel.h>
 
+#ifdef CONFIG_LED_TRIGGER
+#include "led_trigger.h"
+#endif
+
 #include <zephyr/logging/log.h>
 LOG_MODULE_REGISTER(led_gpio, CONFIG_LED_LOG_LEVEL);
 
@@ -85,6 +89,8 @@ static const struct led_gpio_config led_gpio_config_##i = {	\
 DEVICE_DT_INST_DEFINE(i, &led_gpio_init, NULL,			\
 		      NULL, &led_gpio_config_##i,		\
 		      POST_KERNEL, CONFIG_LED_INIT_PRIORITY,	\
-		      &led_gpio_api);
+		      &led_gpio_api);				\
+								\
+LED_TRIGGER_REGISTER(DT_DRV_INST(i))
 
 DT_INST_FOREACH_STATUS_OKAY(LED_GPIO_DEVICE)

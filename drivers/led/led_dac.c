@@ -12,6 +12,10 @@
 #include <zephyr/drivers/led.h>
 #include <zephyr/sys/math_extras.h>
 
+#ifdef CONFIG_LED_TRIGGER
+#include "led_trigger.h"
+#endif
+
 struct led_dac_leds {
 	const struct device *dac;
 	struct dac_channel_cfg chan_cfg;
@@ -117,6 +121,8 @@ static int led_dac_init(const struct device *dev)
 	};                                                                                         \
                                                                                                    \
 	DEVICE_DT_INST_DEFINE(n, &led_dac_init, NULL, NULL, &led_config_##n, POST_KERNEL,          \
-			      CONFIG_LED_INIT_PRIORITY, &led_dac_api);
+			      CONFIG_LED_INIT_PRIORITY, &led_dac_api);                              \
+											   \
+	LED_TRIGGER_REGISTER(DT_DRV_INST(n))
 
 DT_INST_FOREACH_STATUS_OKAY(LED_DAC_DEFINE)
