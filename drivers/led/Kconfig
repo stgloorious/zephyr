@@ -26,6 +26,25 @@ config LED_SHELL
 	help
 	  Enable LED shell for testing.
 
+config LED_TRIGGER
+	bool "LED trigger support"
+	depends on LED
+	help
+	  Enable the LED trigger framework.  LED triggers are
+	  kernel-based sources of LED events that can drive LEDs
+	  according to a pattern or system event (timer blink,
+	  heartbeat, disk/network activity, panic, etc.).
+
+	  Currently the "timer" trigger is implemented: calling
+	  led_blink() on a driver that does not support hardware
+	  blink will use a software fallback driven by the system
+	  workqueue.
+
+	  Calling led_on() or led_off() will automatically cancel
+	  any active trigger on that channel.  Calling
+	  led_set_brightness() updates the ON-phase brightness
+	  without cancelling the blink.
+
 # zephyr-keep-sorted-start
 source "drivers/led/Kconfig.axp192"
 source "drivers/led/Kconfig.dac"

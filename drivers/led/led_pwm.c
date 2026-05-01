@@ -13,6 +13,8 @@
 
 #include <zephyr/drivers/led.h>
 #include <zephyr/drivers/pwm.h>
+
+#include "led_trigger.h"
 #include <zephyr/device.h>
 #include <zephyr/pm/device.h>
 #include <zephyr/kernel.h>
@@ -135,6 +137,8 @@ PM_DEVICE_DT_INST_DEFINE(id, led_pwm_pm_action);		\
 DEVICE_DT_INST_DEFINE(id, &led_pwm_init,			\
 		      PM_DEVICE_DT_INST_GET(id), NULL,		\
 		      &led_pwm_config_##id, POST_KERNEL,	\
-		      CONFIG_LED_INIT_PRIORITY, &led_pwm_api);
+		      CONFIG_LED_INIT_PRIORITY, &led_pwm_api);	\
+								\
+LED_TRIGGER_REGISTER(DT_DRV_INST(id))
 
 DT_INST_FOREACH_STATUS_OKAY(LED_PWM_DEVICE)
