@@ -1,0 +1,21 @@
+sample:
+  description: Demonstration of the LED blink API with software trigger fallback
+  name: LED blink sample
+tests:
+  sample.drivers.led.blink:
+    filter: dt_alias_exists("led0")
+    tags: LED
+    depends_on: gpio
+    integration_platforms:
+      - nucleo_h563zi
+    timeout: 30
+    harness: console
+    harness_config:
+      type: multi_line
+      ordered: true
+      regex:
+        - "Blinking.*500 ms on, 500 ms off"
+        - "Updating.*200 ms on, 800 ms off"
+        - "Stopping blink, LED on"
+        - "LED off"
+        - "Test complete"
