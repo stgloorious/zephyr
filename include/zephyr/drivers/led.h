@@ -27,6 +27,13 @@
 #include <zephyr/types.h>
 #include <zephyr/device.h>
 
+#ifdef CONFIG_LED_TRIGGER
+#include <zephyr/drivers/led/led_trigger.h>
+#endif
+#ifdef CONFIG_LED_TRIGGER_TIMER
+#include <zephyr/drivers/led/led_trigger_timer.h>
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -142,10 +149,15 @@ static inline int z_impl_led_blink(const struct device *dev, uint32_t led,
 {
 	const struct led_driver_api *api = DEVICE_API_GET(led, dev);
 
-	if (api->blink == NULL) {
-		return -ENOSYS;
+	if (api->blink != NULL) {
+		return api->blink(dev, led, delay_on, delay_off);
 	}
-	return api->blink(dev, led, delay_on, delay_off);
+
+#ifdef CONFIG_LED_TRIGGER_TIMER
+	return led_trigger_timer_start(dev, led, delay_on, delay_off);
+#else
+	return -ENOSYS;
+#endif
 }
 
 /**
@@ -207,6 +219,12 @@ static inline int z_impl_led_set_brightness(const struct device *dev,
 	if (value > LED_BRIGHTNESS_MAX) {
 		return -EINVAL;
 	}
+
+#ifdef CONFIG_LED_TRIGGER
+	if (led_trigger_update_brightness(dev, led, value)) {
+		return 0;
+	}
+#endif
 
 	if (api->set_brightness == NULL) {
 		if (value) {
@@ -305,7 +323,8 @@ static inline int z_impl_led_set_color(const struct device *dev, uint32_t led,
 /**
  * @brief Turn on an LED
  *
- * This routine turns on an LED
+ * If a software blink (LED trigger) is active on this channel, it is
+ * cancelled before turning the LED on.
  *
  * LEDs which implements brightness control do not need to implement this, the
  * set_brightness API is used automatically.
@@ -319,6 +338,10 @@ __syscall int led_on(const struct device *dev, uint32_t led);
 static inline int z_impl_led_on(const struct device *dev, uint32_t led)
 {
 	const struct led_driver_api *api = DEVICE_API_GET(led, dev);
+
+#ifdef CONFIG_LED_TRIGGER
+	led_trigger_cancel(dev, led);
+#endif
 
 	if (api->set_brightness == NULL && api->on == NULL) {
 		return -ENOSYS;
@@ -334,7 +357,8 @@ static inline int z_impl_led_on(const struct device *dev, uint32_t led)
 /**
  * @brief Turn off an LED
  *
- * This routine turns off an LED
+ * If a software blink (LED trigger) is active on this channel, it is
+ * cancelled before turning the LED off.
  *
  * LEDs which implements brightness control do not need to implement this, the
  * set_brightness API is used automatically.
@@ -348,6 +372,10 @@ __syscall int led_off(const struct device *dev, uint32_t led);
 static inline int z_impl_led_off(const struct device *dev, uint32_t led)
 {
 	const struct led_driver_api *api = DEVICE_API_GET(led, dev);
+
+#ifdef CONFIG_LED_TRIGGER
+	led_trigger_cancel(dev, led);
+#endif
 
 	if (api->set_brightness == NULL && api->off == NULL) {
 		return -ENOSYS;
