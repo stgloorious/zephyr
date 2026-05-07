@@ -1,0 +1,9 @@
+tests:
+  drivers.led.trigger:
+    tags:
+      - drivers
+      - led
+    harness: ztest
+    platform_allow: native_sim
+    integration_platforms:
+      - native_sim
